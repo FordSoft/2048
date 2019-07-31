@@ -48,7 +48,8 @@ h1.title {
     opacity: 0; } }
 .scores-container {
   float: right;
-  text-align: right; }
+  text-align: right;
+  padding-top: 50px; }
 
 .score-container, .best-container {
   position: relative;

@@ -1,3 +1,6 @@
+import seed from 'seed-random';
+import celerx from './vendor/celerx';
+
 import { Grid } from './grid';
 import { Tile } from './tile';
 
@@ -14,6 +17,12 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
   this.storageManager.clearGameState();
+  
+  var match = celerx.getMatch();
+  this.sharedRandomSeed = match && match.sharedRandomSeed;
+  seed(this.sharedRandomSeed, { global: true });
+  celerx.start();
+  
   this.setup();
 }
 
@@ -72,9 +81,9 @@ GameManager.prototype.addStartTiles = function () {
 // Adds a tile in a random position
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 2 : 4;
+    var r = Math.random();
+    var value = r < 0.5 ? 2 : 4;
     var tile = new Tile(this.grid.randomAvailableCell(), value);
-
     this.grid.insertTile(tile);
   }
 };
@@ -99,7 +108,11 @@ GameManager.prototype.actuate = function () {
     bestScore:  this.storageManager.getBestScore(),
     terminated: this.isGameTerminated()
   });
+  
 
+  if (this.isGameTerminated()){
+    celerx.submitScore(this.score);
+  }
 };
 
 // Represent the current game as an object
